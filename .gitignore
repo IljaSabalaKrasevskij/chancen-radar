@@ -1,0 +1,24 @@
+# Schluessel
+.env
+.env.*
+!.env.example
+
+# Alles Persoenliche bleibt auf deinem Rechner: Profil, Antworten, Lebenslauf, Funde, Laeufe
+data/*
+!data/profile.example.json
+docs/index.html
+logs/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# System / Editor
+.DS_Store
+.vscode/
+.idea/
+
+# Vercel (optional)
+.vercel

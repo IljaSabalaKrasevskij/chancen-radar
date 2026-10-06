@@ -1,0 +1,101 @@
+{
+  "_anleitung": "MUSTER. Nicht von Hand ausfüllen: In Claude Code sagen 'Richte meinen Radar ein'. Claude stellt die Fragen aus FRAGEBOGEN.md und schreibt daraus data/profile.json (bleibt auf deinem Rechner). Diese Datei zeigt nur, wie ein fertiges Profil aussieht.",
+
+  "name": "Vorname Nachname",
+  "ziel": "Teilzeit-Festanstellung (25 bis 30 Stunden) oder freie Projekte in der Projektleitung Marketing. Remote oder hybrid im Raum Köln/Bonn. Start ab sofort.",
+  "current_role": "Projektleitung Marketing bei Firma A (Agentur mit 40 Leuten)",
+
+  "bio_short": "Projektleitung im Marketing mit 9 Jahren Erfahrung in Agentur und Mittelstand. Plant Kampagnen von der Idee bis zur Auswertung und hält Teams, Budgets und Termine zusammen.",
+
+  "bio_long": "Seit 2017 im Marketing, seit 2021 als Projektleitung bei Firma A. Verantwortet dort Kampagnen für Kunden aus Handel und Industrie, führt ein Team aus Text, Design und Social Media und steuert Budgets bis 250.000 Euro im Jahr. Vorher Marketing-Referent bei Firma B (Mittelstand, Maschinenbau). Studium Kommunikationswissenschaft. Arbeitet gern strukturiert und nah an den Zahlen. Deutsch Muttersprache, Englisch verhandlungssicher.",
+
+  "themen_kern": [
+    "Projektleitung im Marketing",
+    "Kampagnenplanung und -steuerung",
+    "Content-Planung und Redaktionspläne",
+    "Teamkoordination mit Freelancern und Agenturen"
+  ],
+  "themen_nah": [
+    "Marketing-Automation (HubSpot)",
+    "Kommunikation für B2B-Mittelstand",
+    "Schulungen und Lehraufträge zu Marketing-Projektmanagement"
+  ],
+  "themen_tabu": [
+    "reiner Vertrieb oder Kaltakquise am Telefon",
+    "Grafikdesign als Hauptaufgabe"
+  ],
+
+  "qualifikationen": [
+    "B.A. Kommunikationswissenschaft",
+    "Scrum Product Owner Zertifikat (2022)",
+    "HubSpot Marketing Software Zertifizierung"
+  ],
+  "qualifikationen_fehlen": [
+    "kein Informatik-Studium",
+    "keine PMP-Zertifizierung",
+    "kein Führerschein"
+  ],
+
+  "languages": [
+    {"code": "de", "level": "Muttersprache"},
+    {"code": "en", "level": "verhandlungssicher (C1)"}
+  ],
+
+  "belege": [
+    "9 Jahre Marketing, davon 4 Jahre Projektleitung",
+    "Budgets bis 250.000 Euro im Jahr verantwortet",
+    "Team aus 6 Leuten geführt"
+  ],
+
+  "stations": [
+    {"period": "seit 2021", "company": "Firma A (Agentur)", "role": "Projektleitung Marketing", "highlight": "Kampagnen für Handel und Industrie, Team aus 6 Leuten, Budgets bis 250.000 Euro."},
+    {"period": "2017 - 2021", "company": "Firma B (Mittelstand, Maschinenbau)", "role": "Marketing-Referent", "highlight": "Messen, Newsletter und Webseite, Einführung von HubSpot."}
+  ],
+
+  "current_location": "Köln, Deutschland (UTC+1). Vor Ort im Raum Köln/Bonn möglich, sonst remote.",
+  "nur_online": false,
+  "status_rechtlich": "Deutsche Staatsangehörigkeit, darf in der ganzen EU arbeiten. Freiberufliche Rechnungen möglich.",
+  "contact_line": "Vorname Nachname | name@example.com | linkedin.com/in/dein-profil",
+
+  "avoid_companies": ["Firma A"],
+  "ausschluss_woerter": ["praktikum", "praktikant", "werkstudent", "minijob", "azubi", "internship", "callcenter", "aussendienst", "außendienst"],
+  "ko_woerter": ["PMP", "Informatikstudium", "Studium der Informatik", "Führerschein"],
+  "schreib_regeln": [
+    "Anrede im Zweifel Sie, bei Startups du",
+    "Nie 'brennen für' oder 'Leidenschaft' schreiben"
+  ],
+
+  "scorer_weights": {
+    "thema_fit": 30,
+    "qualifikation_fit": 25,
+    "ort_fit": 15,
+    "arbeitsmodell_fit": 20,
+    "sprache_markt": 10
+  },
+
+  "scoring_notes": "thema_fit: voll bei Projektleitung, Kampagnen, Content-Planung und Teamkoordination im Marketing. qualifikation_fit: Verlangt die Stelle zwingend ein Informatik-Studium, eine PMP-Zertifizierung oder einen Führerschein: 0. Mehr als 10 Jahre Führungserfahrung als Pflicht: höchstens 10. ort_fit: voll bei remote oder hybrid im Raum Köln/Bonn; Präsenzpflicht außerhalb von Köln/Bonn: 0. arbeitsmodell_fit: voll bei Teilzeit (20 bis 30 Stunden) oder freien Projekten; reine Vollzeit mit 40 Stunden: höchstens 5. sprache_markt: Deutsch oder Englisch voll, andere Arbeitssprachen 0. recommendation 'jetzt_angehen' nur bei score ab 80.",
+
+  "search_terms": {
+    "jobspy": [
+      {"term": "Projektleitung Marketing Teilzeit", "location": "Cologne, Germany", "country_indeed": "germany", "kategorie": "ausschreibung"},
+      {"term": "Projektmanager Marketing", "location": "Germany", "country_indeed": "germany", "kategorie": "ausschreibung", "is_remote": true},
+      {"term": "Marketing Project Manager", "location": "Germany", "country_indeed": "germany", "kategorie": "ausschreibung", "is_remote": true},
+      {"term": "Campaign Manager", "location": "Cologne, Germany", "country_indeed": "germany", "kategorie": "ausschreibung"},
+      {"term": "Dozent Marketing", "location": "Germany", "country_indeed": "germany", "kategorie": "lehre"}
+    ],
+    "firecrawl_search": [
+      {"query": "freie Projektleitung Marketing remote gesucht", "kategorie": "ausschreibung"},
+      {"query": "site:freelancermap.de Projektmanagement Marketing remote", "kategorie": "plattform"},
+      {"query": "Agentur sucht freie Projektmanager Marketing Zusammenarbeit", "kategorie": "kooperation"},
+      {"query": "Dozent Marketing Projektmanagement freiberuflich Weiterbildung online", "kategorie": "lehre"},
+      {"query": "Marketing Club Köln Stellenbörse", "kategorie": "netzwerk"},
+      {"query": "Freelancer Verzeichnis Marketing Projektleitung eintragen", "kategorie": "sichtbarkeit"}
+    ]
+  },
+
+  "display": {
+    "name": "Vorname Nachname",
+    "titel": "Chancen-Radar",
+    "untertitel": "Projektleitung im Marketing, in Teilzeit oder frei, remote oder in Köln"
+  }
+}
