@@ -19,6 +19,7 @@ import os
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
@@ -45,6 +46,12 @@ KAT_NAME = {
 
 def esc(v: Any) -> str:
     return html.escape(str(v or ""))
+
+
+def safe_url(v: Any) -> str:
+    """Links kommen aus fremden Suchergebnissen: nur http(s), sonst koennte ein javascript:-Link Code ausfuehren."""
+    url = str(v or "")
+    return url if urlparse(url).scheme in ("http", "https") else "#"
 
 
 def datum_de(d: datetime) -> str:
@@ -189,7 +196,7 @@ def render_drawer(i: dict[str, Any], uid: str) -> str:
   {beleg}
   {msg}
   <div class="d-foot">
-    <a class="btn-gold" href="{esc(i.get('url'))}" target="_blank" rel="noopener noreferrer">Zur Seite →</a>
+    <a class="btn-gold" href="{esc(safe_url(i.get('url')))}" target="_blank" rel="noopener noreferrer">Zur Seite →</a>
     {copy_btn}
   </div>
 </template>"""
