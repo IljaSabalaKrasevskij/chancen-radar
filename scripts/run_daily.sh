@@ -18,6 +18,8 @@ ROOT="$(pwd)"
 [ -f .env ] && { set -a; source .env; set +a; }
 [ -f .venv/bin/activate ] && source .venv/bin/activate
 export PYTHONUNBUFFERED=1  # Fortschritt sofort im Log, nicht erst am Ende
+# Ein Mac auf Akku schlaeft schnell ein, dann steht der Lauf still. caffeinate haelt ihn wach, bis dieses Skript endet.
+caffeinate -i -w $$ &
 
 DATE=$(date +%Y-%m-%d); STAMP=$(date +%H%M)
 mkdir -p logs
@@ -28,6 +30,13 @@ OLLAMA_ROOT="${LLM_BASE_URL:-http://localhost:11434/v1}"; OLLAMA_ROOT="${OLLAMA_
 if [[ "$OLLAMA_ROOT" == *localhost* || "$OLLAMA_ROOT" == *127.0.0.1* ]] && ! curl -sf "$OLLAMA_ROOT/api/tags" >/dev/null 2>&1; then
   echo "❌ Ollama nicht erreichbar ($OLLAMA_ROOT). Ollama-App starten (oder 'ollama serve'). Details: python3 scripts/doctor.py" | tee -a "$LOGFILE"
   exit 1
+fi
+# Modell fehlt (z.B. beim Aufraeumen geloescht)? Vor der Suche neu laden, sonst kostet die Suche Credits und der
+# Scorer bewertet still nichts. Klappt der Download nicht, bricht der Lauf hier ab. Nur bei lokalem Ollama.
+LLM_MODEL="${LLM_MODEL:-qwen2.5:7b}"
+if [[ "$OLLAMA_ROOT" == *localhost* || "$OLLAMA_ROOT" == *127.0.0.1* ]] && ! curl -sf "$OLLAMA_ROOT/api/tags" | grep -F "\"name\":\"${LLM_MODEL}\"" >/dev/null; then  # ohne -q: sonst bricht curl bei pipefail ab
+  echo "⚠️  Modell ${LLM_MODEL} fehlt in Ollama, lade es neu" | tee -a "$LOGFILE"
+  ollama pull "$LLM_MODEL" 2>&1 | tail -1 | tee -a "$LOGFILE"
 fi
 [ -z "${FIRECRAWL_API_KEY:-}" ] && echo "⚠️  FIRECRAWL_API_KEY fehlt, Websuche wird uebersprungen (LinkedIn/Indeed laufen trotzdem)" | tee -a "$LOGFILE"
 

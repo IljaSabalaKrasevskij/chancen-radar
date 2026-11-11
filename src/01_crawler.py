@@ -198,7 +198,10 @@ def crawl_firecrawl_search(entries: list[dict[str, Any]], profile: dict[str, Any
     # Nur die ersten SCRAPE_MAX neuen Treffer ganz lesen, der Rest behaelt den Such-Ausschnitt.
     # Diese Seiten liest Firecrawl nicht (Fehler kostet trotzdem einen Abruf-Platz).
     unlesbar = ("instagram.com", "reddit.com", "linkedin.com/in/", "facebook.com", "tiktok.com")
-    lesbar = [i for i in hits.values() if not any(u in i["url"] for u in unlesbar)]
+    # PDFs rechnet Firecrawl pro Seite ab: ein Programmheft mit 300 Seiten kostet 300 Credits statt 1. Der Such-Ausschnitt
+    # reicht fuer die Bewertung. Erkannt wird nur ".pdf" am Ende der Adresse (auch vor ? oder #).
+    lesbar = [i for i in hits.values() if not any(u in i["url"] for u in unlesbar)
+              and not re.search(r"\.pdf($|[?#])", i["url"], re.I)]
     for n, item in enumerate(lesbar[:SCRAPE_MAX]):
         if n:
             time.sleep(7)  # ponytail: Free-Plan erlaubt ~10 Abrufe/Minute; bei bezahltem Plan Pause senken

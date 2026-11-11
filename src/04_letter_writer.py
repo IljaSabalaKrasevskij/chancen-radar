@@ -27,7 +27,7 @@ load_dotenv(ROOT / ".env")
 
 RUNS_DIR = ROOT / "data" / "runs"
 PROFILE_PATH = ROOT / "data" / os.environ.get("PROFILE_FILE", "profile.json")
-TODAY = datetime.now().strftime("%Y-%m-%d")
+TODAY = os.environ.get("RUN_DATE") or datetime.now().strftime("%Y-%m-%d")  # RUN_DATE: wie in 03_scorer.py
 LLM_BASE_URL = os.environ.get("LLM_BASE_URL", "http://localhost:11434/v1")
 LLM_MODEL = os.environ.get("LLM_MODEL", "qwen2.5:7b")
 LLM_API_KEY = os.environ.get("LLM_API_KEY", "ollama")

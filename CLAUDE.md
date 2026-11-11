@@ -104,5 +104,8 @@ Danach `python3 src/05_dashboard_build.py`. Einträge mit `geprueft_am` zeigt de
 - KI: OpenAI-kompatible Schnittstelle, Standard Ollama unter `http://localhost:11434/v1` mit `qwen2.5:7b`, einstellbar in `.env`.
 - Firecrawl: `firecrawl-py` ab Version 4 (`Firecrawl(timeout=120).search()` und `.scrape()`).
 - Bewertete Links stehen in `data/seen_urls.json` und werden nicht erneut bezahlt oder bewertet.
+- Der Scorer sichert nach jedem Treffer `data/runs/scored_<Datum>.json` und `seen_urls.json`. Nach einem Abbruch einfach noch einmal starten (`./scripts/run_daily.sh` oder `python3 src/03_scorer.py`), schon Bewertetes wird übersprungen. Alles von einem Tag neu bewerten (z.B. nach geänderten `scoring_notes`): diese `scored_<Datum>.json` löschen. Einen anderen Tag nachholen: `RUN_DATE=JJJJ-MM-TT` vor den Aufruf von `03_scorer.py` und `04_letter_writer.py`.
+- Beiträge und Profile aus sozialen Netzen (Liste `SOZIAL` in `src/03_scorer.py`) werden nicht bewertet, PDFs liest der Crawler nicht ganz (Firecrawl rechnet sie pro Seite ab).
+- `run_daily.sh` prüft vor der Suche, ob `LLM_MODEL` in Ollama liegt, und lädt es sonst neu. `caffeinate` hält den Mac während des Laufs wach.
 - Selbsttests: `python3 src/01b_remote_filter.py --selftest`, `python3 src/03_scorer.py --selftest`, `python3 src/04_letter_writer.py --selftest`.
 - Gebaut für macOS (launchd, `.command`-Dateien). Auf Windows oder Linux: Python-Teil läuft, Zeitplan und Starter musst du anpassen.

@@ -31,7 +31,7 @@ RUNS_DIR.mkdir(parents=True, exist_ok=True)
 PROFILE_PATH = DATA / os.environ.get("PROFILE_FILE", "profile.json")
 SEEN_PATH = DATA / "seen_urls.json"
 
-TODAY = datetime.now().strftime("%Y-%m-%d")
+TODAY = os.environ.get("RUN_DATE") or datetime.now().strftime("%Y-%m-%d")  # RUN_DATE=JJJJ-MM-TT: Lauf eines anderen Tages nachholen
 LLM_BASE_URL = os.environ.get("LLM_BASE_URL", "http://localhost:11434/v1")
 LLM_MODEL = os.environ.get("LLM_MODEL", "qwen2.5:7b")
 LLM_API_KEY = os.environ.get("LLM_API_KEY", "ollama")
@@ -92,6 +92,21 @@ HINWEISE = {
     "Anstellung": re.compile(r"festanstellung|unbefristet|sozialversicherungspflichtig|vollzeit|full[- ]time", re.I),
     "Teilzeit": re.compile(r"teilzeit|part[- ]time", re.I),
 }
+
+# Beitraege und Profile in sozialen Netzen sind keine Chancen (die Suche liefert nur einen Ausschnitt, kein Angebot):
+# nicht bewerten. Wer eines dieser Netze als Quelle will, nimmt es hier heraus. "linkedin.com/jobs" bleibt bewusst frei.
+SOZIAL = ("facebook.com", "instagram.com", "tiktok.com", "reddit.com", "linkedin.com/posts", "linkedin.com/in/")
+
+
+def ist_sozial(url: str) -> bool:
+    return any(s in url for s in SOZIAL)
+
+
+def save_json(path: Path, data: Any, **kw) -> None:
+    """Erst in eine Nebendatei, dann umbenennen: bricht der Lauf mitten im Schreiben ab, bleibt keine halbe Datei zurueck."""
+    tmp = path.with_name(path.name + ".tmp")
+    tmp.write_text(json.dumps(data, ensure_ascii=False, default=str, **kw))
+    tmp.replace(path)
 
 
 def hinweise(text: str, ko_woerter: list[str] | tuple = ()) -> str:
@@ -187,6 +202,8 @@ def selftest() -> None:
     assert hinweise("Projekte ortsunabhängig über eine Videoplattform, freiberuflich") == "Online (ortsunabhängig, videoplattform); Freiberuflich (freiberuflich)"
     assert hinweise("Bewerben Sie sich online") == "keine"
     assert hinweise("Führerschein Klasse B erforderlich", ["Führerschein"]) == "K.o.-Verdacht (führerschein)"
+    assert all(ist_sozial(u) for u in ["https://www.instagram.com/p/x", "https://www.linkedin.com/posts/x", "https://www.linkedin.com/in/x"])
+    assert not any(ist_sozial(u) for u in ["https://www.linkedin.com/jobs/view/1", "https://example.com/stelle"])  # LinkedIn-Stellen bleiben
     print("selftest ok")
 
 
@@ -202,22 +219,32 @@ def main() -> int:
     profile = json.loads(PROFILE_PATH.read_text())
     client = OpenAI(api_key=LLM_API_KEY, base_url=LLM_BASE_URL)
     seen = set(json.loads(SEEN_PATH.read_text())) if SEEN_PATH.exists() else set()
-    print(f"=== Scorer {TODAY}: {len(jobs)} Treffer · LLM {LLM_MODEL} ===")
+    out_path = RUNS_DIR / f"scored_{TODAY}.json"
+    # Ein abgebrochener Lauf macht dort weiter, wo er war: was schon in dieser Datei steht, wird nicht noch einmal bewertet.
+    # Alles von diesem Tag neu bewerten (z.B. nach geaenderten scoring_notes): die Datei loeschen.
+    scored: list[dict[str, Any]] = json.loads(out_path.read_text()) if out_path.exists() else []
+    fertig = {s["url"] for s in scored}
+    print(f"=== Scorer {TODAY}: {len(jobs)} Treffer, davon {sum(j['url'] in fertig for j in jobs)} schon bewertet · LLM {LLM_MODEL} ===")
 
-    scored: list[dict[str, Any]] = []
     for i, job in enumerate(jobs, 1):
+        if job["url"] in fertig:
+            continue
+        if ist_sozial(job["url"]):
+            seen.add(job["url"])  # nicht bewerten, aber merken, damit die Suche den Link nicht wieder bringt
+            continue
         print(f"  [{i}/{len(jobs)}] {job.get('company', '')}: {job.get('title', '')[:60]}")
         result = score_job(job, profile, client)
         if result is None:
             continue  # nicht als gesehen markieren -> naechster Lauf versucht es erneut
         scored.append({**job, **result})
         seen.add(job["url"])
+        save_json(out_path, scored, indent=2)  # nach jedem Treffer sichern, sonst ist bei einem Abbruch alles weg
+        save_json(SEEN_PATH, sorted(seen), indent=1)
         time.sleep(0.2)
 
     scored.sort(key=lambda x: x.get("score", 0), reverse=True)
-    out_path = RUNS_DIR / f"scored_{TODAY}.json"
-    out_path.write_text(json.dumps(scored, indent=2, ensure_ascii=False, default=str))
-    SEEN_PATH.write_text(json.dumps(sorted(seen), indent=1, ensure_ascii=False))
+    save_json(out_path, scored, indent=2)
+    save_json(SEEN_PATH, sorted(seen), indent=1)
     print(f"\n✅ {len(scored)} bewertet → {out_path.name} · Top-Scores: {[s.get('score') for s in scored[:5]]}")
     return 0
 
